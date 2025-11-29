@@ -10,12 +10,20 @@ function App() {
   const [date, setDate] = useState("");
   const [currentPage, setCurrentPage] = useState("gallery");
 
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginStatus, setLoginStatus] = useState("");
+
   const BACKEND_URL = "https://photo-backend-u62f.onrender.com";
 
   // Fetch photos from backend
   const fetchPhotos = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/photos`);
+      const res = await fetch(`${BACKEND_URL}/photos`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setPhotos(data.photos);
     } catch (err) {
@@ -27,11 +35,33 @@ function App() {
   const deletePhoto = async (id) => {
     await fetch(`${BACKEND_URL}/photo/${id}`, {
       method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     });
     fetchPhotos();
   };
 
   // Load gallery on page load
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    if (!savedToken) return;
+
+    const verify = async () => {
+      const res = await fetch(`${BACKEND_URL}/me`, {
+        headers: { Authorization: `Bearer ${savedToken}` },
+      });
+
+      if (res.ok) {
+        setToken(savedToken);
+        setIsLoggedIn(true);
+        fetchPhotos();
+      } else {
+        localStorage.removeItem("token");
+      }
+    };
+
+    verify();
+  }, []);
+
   useEffect(() => {
     fetchPhotos();
   }, []);
@@ -53,6 +83,7 @@ function App() {
     try {
       const res = await fetch(`${BACKEND_URL}/upload`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -71,9 +102,62 @@ function App() {
     }
   };
 
+  const handleLogin = async () => {
+    setLoginStatus("Logging in...");
+    try {
+      const res = await fetch(`${BACKEND_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        setToken(data.access_token);
+        setIsLoggedIn(true);
+        setLoginStatus("");
+        fetchPhotos();
+      } else {
+        setLoginStatus("Invalid username or password");
+      }
+    } catch (err) {
+      setLoginStatus("Network error during login");
+    }
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div style={{ fontFamily: "Arial", padding: "40px", maxWidth: "400px", margin: "0 auto" }}>
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Login</h2>
+
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={{ display: "block", width: "100%", marginBottom: "10px" }}
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ display: "block", width: "100%", marginBottom: "10px" }}
+        />
+
+        <button onClick={handleLogin} style={{ width: "100%", padding: "10px" }}>Log In</button>
+
+        <p>{loginStatus}</p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ fontFamily: "Arial", padding: "40px" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>TITLE GOES HERE</h1>
+      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>Love Letters to Justin</h1>
 
       <nav style={{ display: "flex", gap: "20px", marginBottom: "30px", fontSize: "18px" }}>
         <button onClick={() => setCurrentPage("gallery")} style={{ background: "none", border: "none", cursor: "pointer", fontWeight: currentPage === "gallery" ? "bold" : "normal" }}>
@@ -81,6 +165,9 @@ function App() {
         </button>
         <button onClick={() => setCurrentPage("upload")} style={{ background: "none", border: "none", cursor: "pointer", fontWeight: currentPage === "upload" ? "bold" : "normal" }}>
           Upload
+        </button>
+        <button onClick={() => { localStorage.removeItem("token"); setToken(""); setIsLoggedIn(false); }} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: "auto" }}>
+          Logout
         </button>
       </nav>
 

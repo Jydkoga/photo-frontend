@@ -8,6 +8,7 @@ function App() {
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
   const [date, setDate] = useState("");
+  const [currentPage, setCurrentPage] = useState("gallery");
 
   const BACKEND_URL = "https://photo-backend-u62f.onrender.com";
 
@@ -72,65 +73,81 @@ function App() {
 
   return (
     <div style={{ fontFamily: "Arial", padding: "40px" }}>
-      <h1>Photo Upload Demo</h1>
+      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>TITLE GOES HERE</h1>
 
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+      <nav style={{ display: "flex", gap: "20px", marginBottom: "30px", fontSize: "18px" }}>
+        <button onClick={() => setCurrentPage("gallery")} style={{ background: "none", border: "none", cursor: "pointer", fontWeight: currentPage === "gallery" ? "bold" : "normal" }}>
+          Gallery
+        </button>
+        <button onClick={() => setCurrentPage("upload")} style={{ background: "none", border: "none", cursor: "pointer", fontWeight: currentPage === "upload" ? "bold" : "normal" }}>
+          Upload
+        </button>
+      </nav>
 
-      <div style={{ marginTop: "20px", marginBottom: "10px" }}>
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={{ display: "block", marginBottom: "10px", width: "200px" }}
-        />
+      {currentPage === "upload" && (
+        <div>
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
 
-        <textarea
-          placeholder="Caption"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          style={{ display: "block", marginBottom: "10px", width: "300px", height: "60px" }}
-        />
+          <div style={{ marginTop: "20px", marginBottom: "10px" }}>
+            <input
+              type="text"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              style={{ display: "block", marginBottom: "10px", width: "200px" }}
+            />
 
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          style={{ display: "block", marginBottom: "10px", width: "150px" }}
-        />
-      </div>
+            <textarea
+              placeholder="Caption"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              style={{ display: "block", marginBottom: "10px", width: "300px", height: "60px" }}
+            />
 
-      <button onClick={handleUpload} style={{ marginLeft: "10px" }}>
-        Upload
-      </button>
-
-      <p>{status}</p>
-
-      <h2>Gallery</h2>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-        {photos.map((photo) => (
-          <div key={photo.id} style={{ position: "relative" }}>
-            <img src={photo.url} alt="uploaded" width="200" />
-
-            <button
-              onClick={() => deletePhoto(photo.id)}
-              style={{
-                position: "absolute",
-                top: 5,
-                right: 5,
-                background: "red",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              X
-            </button>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              style={{ display: "block", marginBottom: "10px", width: "150px" }}
+            />
           </div>
-        ))}
-      </div>
+
+          <button onClick={handleUpload} style={{ marginLeft: "10px" }}>
+            Upload
+          </button>
+
+          <p>{status}</p>
+        </div>
+      )}
+
+      {currentPage === "gallery" && (
+        <>
+          <h2>Gallery</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+            {photos.map((photo) => (
+              <div key={photo.id} style={{ position: "relative" }}>
+                <img src={photo.url} alt="uploaded" width="200" />
+
+                <button
+                  onClick={() => deletePhoto(photo.id)}
+                  style={{
+                    position: "absolute",
+                    top: 5,
+                    right: 5,
+                    background: "red",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  X
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

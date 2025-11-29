@@ -25,6 +25,12 @@ function App() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+
+      // If unauthorized or photos missing, do NOT overwrite state
+      if (!res.ok || !data || !Array.isArray(data.photos)) {
+        return;
+      }
+
       setPhotos(data.photos);
     } catch (err) {
       console.error("Error fetching photos:", err);
@@ -60,10 +66,6 @@ function App() {
     };
 
     verify();
-  }, []);
-
-  useEffect(() => {
-    fetchPhotos();
   }, []);
 
   const handleUpload = async () => {

@@ -125,8 +125,49 @@ function App() {
           <h2>Gallery</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
             {photos.map((photo) => (
-              <div key={photo.id} style={{ position: "relative" }}>
-                <img src={photo.url} alt="uploaded" width="200" />
+              <div
+                key={photo.id}
+                className="overlay-hover"
+                style={{ position: "relative", width: "200px", height: "200px", overflow: "hidden" }}
+              >
+                <img
+                  src={photo.url}
+                  alt="uploaded"
+                  className="gallery-img"
+                  style={{
+                    transition: "filter 0.3s ease",
+                    width: "200px",
+                    height: "200px",
+                    objectFit: "cover",
+                  }}
+                />
+
+                <div
+                  className="overlay"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    background: "rgba(0, 0, 0, 0.6)",
+                    color: "white",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                    opacity: 0,
+                    transition: "opacity 0.3s ease",
+                    padding: "10px",
+                    boxSizing: "border-box",
+                    zIndex: 5,
+                  }}
+                >
+                  <h3 style={{ margin: "5px 0" }}>{photo.title}</h3>
+                  <p style={{ margin: "5px 0", fontSize: "14px" }}>{photo.date}</p>
+                  <p style={{ margin: "5px 0", fontSize: "14px" }}>{photo.caption}</p>
+                </div>
 
                 <button
                   onClick={() => deletePhoto(photo.id)}
@@ -139,6 +180,7 @@ function App() {
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
+                    zIndex: 10,
                   }}
                 >
                   X
@@ -148,6 +190,18 @@ function App() {
           </div>
         </>
       )}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            .overlay-hover:hover .overlay {
+              opacity: 1 !important;
+            }
+            .overlay-hover:hover .gallery-img {
+              filter: blur(4px) !important;
+            }
+          `,
+        }}
+      />
     </div>
   );
 }

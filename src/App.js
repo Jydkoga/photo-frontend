@@ -5,6 +5,9 @@ function App() {
   const [uploadedUrl, setUploadedUrl] = useState(null);
   const [status, setStatus] = useState("");
   const [photos, setPhotos] = useState([]);
+  const [title, setTitle] = useState("");
+  const [caption, setCaption] = useState("");
+  const [date, setDate] = useState("");
 
   const BACKEND_URL = "https://photo-backend-u62f.onrender.com";
 
@@ -40,6 +43,9 @@ function App() {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("title", title);
+    formData.append("caption", caption);
+    formData.append("date", date);
 
     setStatus("Uploading...");
 
@@ -69,6 +75,30 @@ function App() {
       <h1>Photo Upload Demo</h1>
 
       <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+
+      <div style={{ marginTop: "20px", marginBottom: "10px" }}>
+        <input
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          style={{ display: "block", marginBottom: "10px", width: "200px" }}
+        />
+
+        <textarea
+          placeholder="Caption"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          style={{ display: "block", marginBottom: "10px", width: "300px", height: "60px" }}
+        />
+
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          style={{ display: "block", marginBottom: "10px", width: "150px" }}
+        />
+      </div>
 
       <button onClick={handleUpload} style={{ marginLeft: "10px" }}>
         Upload

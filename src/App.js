@@ -168,7 +168,15 @@ function App() {
         <button onClick={() => setCurrentPage("upload")} style={{ background: "none", border: "none", cursor: "pointer", fontWeight: currentPage === "upload" ? "bold" : "normal" }}>
           Upload
         </button>
-        <button onClick={() => { localStorage.removeItem("token"); setToken(""); setIsLoggedIn(false); }} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: "auto" }}>
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            setToken("");
+            setIsLoggedIn(false);
+            setPhotos([]);
+          }}
+          style={{ background: "none", border: "none", cursor: "pointer", marginLeft: "auto" }}
+        >
           Logout
         </button>
       </nav>

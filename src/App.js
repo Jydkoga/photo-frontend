@@ -9,12 +9,15 @@ function App() {
   const [caption, setCaption] = useState("");
   const [date, setDate] = useState("");
   const [currentPage, setCurrentPage] = useState("gallery");
+  const [expandedPhoto, setExpandedPhoto] = useState(null);
 
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginStatus, setLoginStatus] = useState("");
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const BACKEND_URL = "https://photo-backend-u62f.onrender.com";
 
@@ -228,6 +231,10 @@ function App() {
                 style={{ position: "relative", width: "200px", height: "200px", overflow: "hidden" }}
               >
                 <img
+                  onClick={() => {
+                    setExpandedPhoto(photo);
+                    setTimeout(() => setIsModalVisible(true), 10);
+                  }}
                   src={photo.url}
                   alt="uploaded"
                   className="gallery-img"
@@ -259,6 +266,7 @@ function App() {
                     padding: "10px",
                     boxSizing: "border-box",
                     zIndex: 5,
+                    pointerEvents: "none",
                   }}
                 >
                   <h3 style={{ margin: "5px 0" }}>{photo.title}</h3>
@@ -286,6 +294,44 @@ function App() {
             ))}
           </div>
         </>
+      )}
+      {expandedPhoto && (
+        <div
+          onClick={() => {
+            setIsModalVisible(false);
+            setTimeout(() => setExpandedPhoto(null), 300);
+          }}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+            cursor: "pointer",
+            transition: "opacity 0.3s ease",
+            opacity: isModalVisible ? 1 : 0,
+          }}
+        >
+          <img
+            src={expandedPhoto.url}
+            alt="expanded"
+            style={{
+              maxWidth: "90%",
+              maxHeight: "90%",
+              borderRadius: "8px",
+              boxShadow: "0 0 20px rgba(0,0,0,0.5)",
+              cursor: "default",
+              transition: "transform 0.3s ease",
+              transform: isModalVisible ? "scale(1)" : "scale(0.95)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
       )}
       <style
         dangerouslySetInnerHTML={{

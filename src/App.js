@@ -19,6 +19,14 @@ function App() {
     }
   };
 
+  // Delete a photo
+  const deletePhoto = async (id) => {
+    await fetch(`${BACKEND_URL}/photo/${id}`, {
+      method: "DELETE",
+    });
+    fetchPhotos();
+  };
+
   // Load gallery on page load
   useEffect(() => {
     fetchPhotos();
@@ -71,8 +79,26 @@ function App() {
       <h2>Gallery</h2>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-        {photos.map((url, i) => (
-          <img key={i} src={url} alt="uploaded" width="200" />
+        {photos.map((photo) => (
+          <div key={photo.id} style={{ position: "relative" }}>
+            <img src={photo.url} alt="uploaded" width="200" />
+
+            <button
+              onClick={() => deletePhoto(photo.id)}
+              style={{
+                position: "absolute",
+                top: 5,
+                right: 5,
+                background: "red",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              X
+            </button>
+          </div>
         ))}
       </div>
     </div>
